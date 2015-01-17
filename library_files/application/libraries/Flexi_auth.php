@@ -2,13 +2,13 @@
 /*
 * Name: flexi auth
 *
-* Author: 
+* Author:
 * Rob Hussey
 * flexiauth@haseydesign.com
 * haseydesign.com/flexi-auth
 *
 * Copyright 2012 Rob Hussey
-* 
+*
 * Previous Authors / Contributors:
 * Ben Edmunds, benedmunds.com
 * Phil Sturgeon, philsturgeon.co.uk
@@ -18,9 +18,9 @@
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 * http://www.apache.org/licenses/LICENSE-2.0
-* 
+*
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,20 +33,24 @@
 */
 
 // Load the flexi auth Lite library to allow it to be extended.
-load_class('Flexi_auth_lite', 'libraries', FALSE);
+
+//load_class('Flexi_auth_lite', 'libraries', FALSE);
+//CI 3 change -> http://forum.codeigniter.com/thread-197-post-845.html
+$CI =& get_instance();
+$CI->load->library('Flexi_auth_lite');
 
 class Flexi_auth extends Flexi_auth_lite
 {
 	public function __construct()
 	{
 		parent::__construct();
-		
+
 		$this->CI->load->model('flexi_auth_model');
-	}	
-	
-	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###	
+	}
+
+	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
 	// LOGIN / VALIDATION FUNCTIONS
-	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###	
+	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
 
 	/**
 	 * login
@@ -55,7 +59,7 @@ class Flexi_auth extends Flexi_auth_lite
 	 * @return void
 	 * @author Mathew Davies
 	 */
-	public function login($identity = FALSE, $password = FALSE, $remember_user = FALSE) 
+	public function login($identity = FALSE, $password = FALSE, $remember_user = FALSE)
 	{
 		if ($this->CI->flexi_auth_model->login($identity, $password, $remember_user))
 		{
@@ -68,12 +72,12 @@ class Flexi_auth extends Flexi_auth_lite
 		{
 			$this->CI->flexi_auth_model->set_error_message('login_unsuccessful', 'config');
 		}
-		
+
 		return FALSE;
 	}
-		
+
 	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
-	
+
 	/**
 	 * ip_login_attempts_exceeded
 	 * Validates whether the number of failed login attempts from a unique IP address has exceeded a defined limit.
@@ -86,7 +90,7 @@ class Flexi_auth extends Flexi_auth_lite
 	{
 		return $this->CI->flexi_auth_model->ip_login_attempts_exceeded();
 	}
-	
+
 	/**
 	 * recaptcha
 	 * Generates the html for Google reCAPTCHA.
@@ -99,7 +103,7 @@ class Flexi_auth extends Flexi_auth_lite
 	{
 		return $this->CI->flexi_auth_model->recaptcha($ssl);
 	}
-	
+
 	/**
 	 * validate_recaptcha
 	 * Validates if a Google reCAPTCHA answer submitted via http POST data is correct.
@@ -111,11 +115,11 @@ class Flexi_auth extends Flexi_auth_lite
 	{
 		return $this->CI->flexi_auth_model->validate_recaptcha();
 	}
-	
+
 	/**
 	 * math_captcha
 	 * Generates a math captcha question and answer.
-	 * The question is returned as a string, whilst the answer is set as a CI flash session. 
+	 * The question is returned as a string, whilst the answer is set as a CI flash session.
 	 * Use the 'validate_math_captcha()' function to validate the users submitted answer.
 	 *
 	 * @return string
@@ -124,12 +128,12 @@ class Flexi_auth extends Flexi_auth_lite
 	public function math_captcha()
 	{
 		$captcha = $this->CI->flexi_auth_model->math_captcha();
-		
+
 		$this->CI->session->set_flashdata($this->CI->auth->session_name['math_captcha'], $captcha['answer']);
-		
+
 		return $captcha['equation'];
 	}
-	
+
 	/**
 	 * validate_math_captcha
 	 * Validates if a submitted math captcha answer is correct.
@@ -141,7 +145,7 @@ class Flexi_auth extends Flexi_auth_lite
 	{
 		return ($answer == $this->CI->session->flashdata($this->CI->auth->session_name['math_captcha']));
 	}
-	
+
 	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
 
 	/**
@@ -155,7 +159,7 @@ class Flexi_auth extends Flexi_auth_lite
 	{
 		return $this->CI->auth->auth_security['min_password_length'];
 	}
-	
+
 	/**
 	 * valid_password_chars
 	 * Validate whether the submitted password only contains valid characters defined by the config file.
@@ -167,15 +171,15 @@ class Flexi_auth extends Flexi_auth_lite
 	{
 		return (bool) preg_match("/^[".$this->CI->auth->auth_security['valid_password_chars']."]+$/i", $password);
 	}
-	
 
-	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###	
+
+	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
 	// USER TASK FUNCTIONS
-	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###	
-	
+	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
+
 	/**
 	 * activate_user
-	 * Activates a users account allowing them to login to their account. 
+	 * Activates a users account allowing them to login to their account.
 	 * If $verify_token = TRUE, a valid $activation_token must also be submitted.
 	 *
 	 * @return void
@@ -219,30 +223,30 @@ class Flexi_auth extends Flexi_auth_lite
 	 * @return bool
 	 * @author Rob Hussey
 	 */
-	public function resend_activation_token($identity) 
+	public function resend_activation_token($identity)
 	{
 		// Get primary identity.
 		$identity = $this->CI->flexi_auth_model->get_primary_identity($identity);
-		
+
 		if (empty($identity))
 		{
 			$this->CI->flexi_auth_model->set_error_message('activation_email_unsuccessful', 'config');
 			return FALSE;
 		}
-		
+
 		// Get user information.
 		$sql_select = array(
 			$this->CI->auth->tbl_col_user_account['id'],
 			$this->CI->auth->tbl_col_user_account['active']
 		);
-		
+
 		$sql_where[$this->CI->auth->primary_identity_col] = $identity;
-		
+
 		$user = $this->CI->flexi_auth_model->get_users($sql_select, $sql_where)->row();
 
 		$user_id = $user->{$this->CI->auth->database_config['user_acc']['columns']['id']};
-		$active_status = $user->{$this->CI->auth->database_config['user_acc']['columns']['active']};		
-		
+		$active_status = $user->{$this->CI->auth->database_config['user_acc']['columns']['active']};
+
 		// If account is already activated.
 		if ($active_status == 1)
 		{
@@ -260,14 +264,14 @@ class Flexi_auth extends Flexi_auth_lite
 			);
 			$sql_where[$this->CI->auth->primary_identity_col] = $identity;
 			$user = $this->CI->flexi_auth_model->get_users($sql_select, $sql_where)->row();
-			
-			$email = $user->{$this->CI->auth->database_config['user_acc']['columns']['email']}; 
+
+			$email = $user->{$this->CI->auth->database_config['user_acc']['columns']['email']};
 			$activation_token = $user->{$this->CI->auth->database_config['user_acc']['columns']['activation_token']};
-			
+
 			// Set email data.
 			$email_to = $email;
 			$email_title = ' - Account Activation';
-		
+
 			$user_data = array(
 				'user_id' => $user_id,
 				'identity' => $identity,
@@ -281,16 +285,16 @@ class Flexi_auth extends Flexi_auth_lite
 				return TRUE;
 			}
 		}
-		
+
 		$this->CI->flexi_auth_model->set_error_message('activation_email_unsuccessful', 'config');
 		return FALSE;
 	}
 
 	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
-	
+
 	/**
 	 * validate_current_password
-	 * Validates a submitted 'Current' password against the database for a specific user. 
+	 * Validates a submitted 'Current' password against the database for a specific user.
 	 *
 	 * @return bool
 	 * @author Rob Hussey
@@ -298,11 +302,11 @@ class Flexi_auth extends Flexi_auth_lite
 	public function validate_current_password($current_password, $identity)
 	{
 		return ($this->CI->flexi_auth_model->verify_password($identity, $current_password));
-	}	
-	
+	}
+
 	/**
 	 * change_password
-	 * Validates a submitted 'Current' password against the database, if valid, the database is updated with the 'New' password. 
+	 * Validates a submitted 'Current' password against the database, if valid, the database is updated with the 'New' password.
 	 *
 	 * @return bool
 	 * @author Mathew Davies
@@ -317,8 +321,8 @@ class Flexi_auth extends Flexi_auth_lite
 
 		$this->CI->flexi_auth_model->set_error_message('password_change_unsuccessful', 'config');
 		return FALSE;
-	}	
-	
+	}
+
 	/**
 	 * forgotten_password
 	 * Sends the user an email containing a link the user must click to verify they have requested to change their forgotten password.
@@ -326,7 +330,7 @@ class Flexi_auth extends Flexi_auth_lite
 	 * @return bool
 	 * @author Rob Hussey
 	 */
-	public function forgotten_password($identifier) 
+	public function forgotten_password($identifier)
 	{
 		// Get users primary identity.
 		if (!$identity = $this->CI->flexi_auth_model->get_primary_identity($identifier))
@@ -334,7 +338,7 @@ class Flexi_auth extends Flexi_auth_lite
 			$this->CI->flexi_auth_model->set_error_message('email_forgot_password_unsuccessful', 'config');
 			return FALSE;
 		}
-	
+
 		if ($this->CI->flexi_auth_model->forgotten_password($identity))
 		{
 			// Get user information.
@@ -342,31 +346,31 @@ class Flexi_auth extends Flexi_auth_lite
 				$this->CI->auth->tbl_col_user_account['id'],
 				$this->CI->auth->tbl_col_user_account['email'],
 				$this->CI->auth->tbl_col_user_account['forgot_password_token']
-			);			
+			);
 			$sql_where[$this->CI->auth->primary_identity_col] = $identity;
-			
+
 			$user = $this->CI->flexi_auth_model->get_users($sql_select, $sql_where)->row();
 			$user_id = $user->{$this->CI->auth->database_config['user_acc']['columns']['id']};
-			$forgotten_password_token = $user->{$this->CI->auth->database_config['user_acc']['columns']['forgot_password_token']}; 
+			$forgotten_password_token = $user->{$this->CI->auth->database_config['user_acc']['columns']['forgot_password_token']};
 
 			// Set email data.
 			$email_to = $user->{$this->CI->auth->database_config['user_acc']['columns']['email']};
 			$email_title = ' - Forgotten Password Verification';
-			
+
 			$user_data = array(
 				'user_id' => $user_id,
 				'identity' => $identity,
 				'forgotten_password_token' => $forgotten_password_token
 			);
 			$template = $this->CI->auth->email_settings['email_template_directory'].$this->CI->auth->email_settings['email_template_forgot_password'];
-			
+
 			if ($this->CI->flexi_auth_model->send_email($email_to, $email_title, $user_data, $template))
 			{
 				$this->CI->flexi_auth_model->set_status_message('email_forgot_password_successful', 'config');
 				return TRUE;
 			}
 		}
-		
+
 		$this->CI->flexi_auth_model->set_error_message('email_forgot_password_unsuccessful', 'config');
 		return FALSE;
 	}
@@ -400,9 +404,9 @@ class Flexi_auth extends Flexi_auth_lite
 				$this->CI->auth->tbl_col_user_account['salt'],
 				$this->CI->auth->tbl_col_user_account['email']
 			);
-			
+
 			$sql_where[$this->CI->auth->tbl_col_user_account['id']] = $user_id;
-			
+
 			$user = $this->CI->flexi_auth_model->get_users($sql_select, $sql_where)->row();
 
 			if (!is_object($user))
@@ -416,14 +420,14 @@ class Flexi_auth extends Flexi_auth_lite
 
 			// If no new password is set via $new_password, the function will generate a new one.
 			$new_password = $this->CI->flexi_auth_model->change_forgotten_password($user_id, $forgot_password_token, $new_password, $database_salt);
-			
+
 			// Send user email with new password if function variable $send_email = TRUE.
 			if ($send_email)
 			{
 				// Set email data
 				$email_to = $user->{$this->CI->auth->database_config['user_acc']['columns']['email']};
 				$email_title = ' - New Password';
-			
+
 				$user_data = array(
 					'identity' => $identity,
 					'new_password' => $new_password
@@ -444,13 +448,13 @@ class Flexi_auth extends Flexi_auth_lite
 				return TRUE;
 			}
 		}
-		
+
 		$this->CI->flexi_auth_model->set_error_message('password_token_invalid', 'config');
 		return FALSE;
 	}
-	
+
 	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
-	
+
 	/**
 	 * update_email_via_verification
 	 * Sends the user a verification email to their new email address, the user must then click a link within the email to update their accounts email address.
@@ -460,7 +464,7 @@ class Flexi_auth extends Flexi_auth_lite
 	 * @return bool
 	 * @author Rob Hussey
 	 */
-	public function update_email_via_verification($user_id, $new_email) 
+	public function update_email_via_verification($user_id, $new_email)
 	{
 		if ($this->CI->flexi_auth_model->set_update_email_token($user_id, $new_email))
 		{
@@ -470,7 +474,7 @@ class Flexi_auth extends Flexi_auth_lite
 				$this->CI->auth->tbl_col_user_account['update_email_token']
 			);
 			$sql_where[$this->CI->auth->tbl_col_user_account['id']] = $user_id;
-			
+
 			$user = $this->CI->flexi_auth_model->get_users($sql_select, $sql_where)->row();
 
 			if (!is_object($user))
@@ -478,23 +482,23 @@ class Flexi_auth extends Flexi_auth_lite
 				$this->CI->flexi_auth_model->set_error_message('update_unsuccessful', 'config');
 				return FALSE;
 			}
-			
+
 			$current_email = $user->{$this->CI->auth->database_config['user_acc']['columns']['email']};
 			$update_email_token = $user->{$this->CI->auth->database_config['user_acc']['columns']['update_email_token']};
-			
+
 			// Send email activation email.
 			$email_to = $new_email;
 			$email_title = ' - Email Change Verification';
-		
+
 			$user_data = array(
 				'user_id' => $user_id,
 				'current_email' => $current_email,
 				'new_email' => $new_email,
 				'update_email_token' => $update_email_token
 			);
-			
+
 			$template = $this->CI->auth->email_settings['email_template_directory'].$this->CI->auth->email_settings['email_template_update_email'];
-			
+
 			if ($this->CI->flexi_auth_model->send_email($email_to, $email_title, $user_data, $template))
 			{
 				$this->CI->flexi_auth_model->set_status_message('email_activation_email_successful', 'config');
@@ -506,11 +510,11 @@ class Flexi_auth extends Flexi_auth_lite
 				return FALSE;
 			}
 		}
-		
+
 		$this->CI->flexi_auth_model->set_error_message('update_unsuccessful', 'config');
 		return FALSE;
 	}
-	
+
 	/**
 	 * verify_updated_email
 	 * Verifies a submitted $update_email_token and updates their account with the new email address.
@@ -525,16 +529,16 @@ class Flexi_auth extends Flexi_auth_lite
 			$this->CI->flexi_auth_model->set_status_message('update_successful', 'config');
 			return TRUE;
 		}
-		
+
 		$this->CI->flexi_auth_model->set_error_message('update_unsuccessful', 'config');
 		return FALSE;
 	}
-	
-	
-	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###	
+
+
+	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
 	// USER MANAGEMENT / CRUD FUNCTIONS
-	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###	
-	
+	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
+
 	/**
 	 * insert_user
 	 * Inserts user account and profile data, returning the users new id.
@@ -542,7 +546,7 @@ class Flexi_auth extends Flexi_auth_lite
 	 * @return void
 	 * @author Rob Hussey
 	 */
-	public function insert_user($email, $username = FALSE, $password, $user_data, $group_id = FALSE, $activate = FALSE) 
+	public function insert_user($email, $username = FALSE, $password, $user_data, $group_id = FALSE, $activate = FALSE)
 	{
 		$user_id = $this->CI->flexi_auth_model->insert_user($email, $username, $password, $user_data, $group_id);
 
@@ -553,28 +557,28 @@ class Flexi_auth extends Flexi_auth_lite
 			{
 				// If an account activation time limit is set by the config file, retain activation token.
 				$clear_token = ($this->CI->auth->auth_settings['account_activation_time_limit'] > 0) ? FALSE : TRUE;
-				
-				$this->CI->flexi_auth_model->activate_user($user_id, FALSE, FALSE, $clear_token);		
+
+				$this->CI->flexi_auth_model->activate_user($user_id, FALSE, FALSE, $clear_token);
 			}
-			
+
 			$sql_select = array(
 				$this->CI->auth->primary_identity_col,
 				$this->CI->auth->tbl_col_user_account['activation_token']
 			);
-			
+
 			$sql_where[$this->CI->auth->tbl_col_user_account['id']] = $user_id;
-			
-			$user = $this->CI->flexi_auth_model->get_users($sql_select, $sql_where)->row(); 
+
+			$user = $this->CI->flexi_auth_model->get_users($sql_select, $sql_where)->row();
 
 			if (!is_object($user))
 			{
 				$this->CI->flexi_auth_model->set_error_message('account_creation_unsuccessful', 'config');
 				return FALSE;
 			}
-			
+
 			$identity = $user->{$this->CI->auth->db_settings['primary_identity_col']};
 			$activation_token = $user->{$this->CI->auth->database_config['user_acc']['columns']['activation_token']};
-			
+
 			// Prepare account activation email.
 			// If the $activation_token is not empty, the account must be activated via email before the user can login.
 			if (!empty($activation_token))
@@ -582,7 +586,7 @@ class Flexi_auth extends Flexi_auth_lite
 				// Set email data.
 				$email_to = $email;
 				$email_title = ' - Account Activation';
-			
+
 				$user_data = array(
 					'user_id' => $user_id,
 					'identity' => $identity,
@@ -599,7 +603,7 @@ class Flexi_auth extends Flexi_auth_lite
 				$this->CI->flexi_auth_model->set_error_message('activation_email_unsuccessful', 'config');
 				return FALSE;
 			}
-			
+
 			$this->CI->flexi_auth_model->set_status_message('account_creation_successful', 'config');
 			return $user_id;
 		}
@@ -609,7 +613,7 @@ class Flexi_auth extends Flexi_auth_lite
 			return FALSE;
 		}
 	}
-	
+
 	/**
 	 * update_user
 	 * Updates the main user account table and any linked custom user tables with the submitted data.
@@ -647,7 +651,7 @@ class Flexi_auth extends Flexi_auth_lite
 		$this->CI->flexi_auth_model->set_error_message('delete_unsuccessful', 'config');
 		return FALSE;
 	}
-	
+
 	/**
 	 * delete_unactivated_users
 	 * Delete users that have not activated their account within a set time period.
@@ -659,11 +663,11 @@ class Flexi_auth extends Flexi_auth_lite
 	{
 		$users = $this->CI->flexi_auth_model
 			->get_unactivated_users($inactive_days, $this->CI->auth->tbl_col_user_account['id'], $sql_where);
-				
+
 		if ($users->num_rows() > 0)
 		{
 			$users = $users->result_array();
-		
+
 			foreach ($users as $user)
 			{
 				$user_id = $user[$this->CI->auth->database_config['user_acc']['columns']['id']];
@@ -672,11 +676,11 @@ class Flexi_auth extends Flexi_auth_lite
 			$this->CI->flexi_auth_model->set_status_message('delete_successful', 'config');
 			return TRUE;
 		}
-		
+
 		$this->CI->flexi_auth_model->set_error_message('delete_unsuccessful', 'config');
 		return FALSE;
 	}
-	
+
 	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
 
 	/**
@@ -697,7 +701,7 @@ class Flexi_auth extends Flexi_auth_lite
 		$this->CI->flexi_auth_model->set_error_message('update_unsuccessful', 'config');
 		return FALSE;
 	}
-	
+
 	/**
 	 * update_custom_user_data
 	 * Updates a custom user table with any submitted data.
@@ -737,9 +741,9 @@ class Flexi_auth extends Flexi_auth_lite
 		$this->CI->flexi_auth_model->set_error_message('delete_unsuccessful', 'config');
 		return FALSE;
 	}
-	
+
 	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
-	
+
 	/**
 	 * insert_group
 	 * Inserts a new user group to the database. If the group has admin privileges this can be set using $is_admin = TRUE.
@@ -758,7 +762,7 @@ class Flexi_auth extends Flexi_auth_lite
 		$this->CI->flexi_auth_model->set_error_message('update_unsuccessful', 'config');
 		return FALSE;
 	}
-	
+
 	/**
 	 * update_group
 	 * Updates a user group with any submitted data.
@@ -796,9 +800,9 @@ class Flexi_auth extends Flexi_auth_lite
 		$this->CI->flexi_auth_model->set_error_message('delete_unsuccessful', 'config');
 		return FALSE;
 	}
-	
+
 	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
-	
+
 	/**
 	 * insert_privilege
 	 * Inserts a new user privilege to the database.
@@ -817,7 +821,7 @@ class Flexi_auth extends Flexi_auth_lite
 		$this->CI->flexi_auth_model->set_error_message('update_unsuccessful', 'config');
 		return FALSE;
 	}
-	
+
 	/**
 	 * update_privilege
 	 * Updates a user privilege with any submitted data.
@@ -855,7 +859,7 @@ class Flexi_auth extends Flexi_auth_lite
 		$this->CI->flexi_auth_model->set_error_message('delete_unsuccessful', 'config');
 		return FALSE;
 	}
-	
+
 	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
 
 	/**
@@ -876,7 +880,7 @@ class Flexi_auth extends Flexi_auth_lite
 		$this->CI->flexi_auth_model->set_error_message('update_unsuccessful', 'config');
 		return FALSE;
 	}
-	
+
 	/**
 	 * delete_privilege_user
 	 * Deletes a user from the user privilege user table.
@@ -895,9 +899,9 @@ class Flexi_auth extends Flexi_auth_lite
 		$this->CI->flexi_auth_model->set_error_message('delete_unsuccessful', 'config');
 		return FALSE;
 	}
-        
+
 	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
-        
+
 	/**
 	 * insert_user_group_privilege
 	 * Inserts a new user group privilege to the database.
@@ -916,7 +920,7 @@ class Flexi_auth extends Flexi_auth_lite
 		$this->CI->flexi_auth_model->set_error_message('update_unsuccessful', 'config');
 		return FALSE;
 	}
-       
+
 	/**
 	 * delete_user_group_privilege
 	 * Deletes a user group privilege from the user privilege group table.
@@ -935,12 +939,12 @@ class Flexi_auth extends Flexi_auth_lite
 		$this->CI->flexi_auth_model->set_error_message('delete_unsuccessful', 'config');
 		return FALSE;
 	}
-	
+
 	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
-	
+
 	/**
 	 * identity_available
-	 * Returns whether a user identity is available in the database. 
+	 * Returns whether a user identity is available in the database.
 	 * The identity columns are defined via the $config['database']['settings']['identity_cols'] variable in the config file.
 	 *
 	 * @return bool
@@ -950,10 +954,10 @@ class Flexi_auth extends Flexi_auth_lite
 	{
 		return $this->CI->flexi_auth_model->identity_available($identity, $user_id);
 	}
-	
+
 	/**
 	 * email_available
-	 * Returns whether an email address is available in the database. 
+	 * Returns whether an email address is available in the database.
 	 *
 	 * @return bool
 	 * @author Rob Hussey
@@ -962,10 +966,10 @@ class Flexi_auth extends Flexi_auth_lite
 	{
 		return $this->CI->flexi_auth_model->email_available($email, $user_id);
 	}
-	
+
 	/**
 	 * username_available
-	 * Returns whether a username is available in the database. 
+	 * Returns whether a username is available in the database.
 	 *
 	 * @return bool
 	 * @author Rob Hussey
@@ -974,12 +978,12 @@ class Flexi_auth extends Flexi_auth_lite
 	{
 		return $this->CI->flexi_auth_model->username_available($username, $user_id);
 	}
-	
-	
-	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###	
+
+
+	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
 	// GET USER / GROUP / PRIVILEGE FUNCTIONS
-	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###	
-		
+	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
+
 	/**
 	 * search_users_query
 	 * Search user table using SQL WHERE 'x' LIKE '%y%' statement
@@ -992,12 +996,12 @@ class Flexi_auth extends Flexi_auth_lite
 	{
 		return $this->CI->flexi_auth_model->search_users($search_query, $exact_match, $sql_select, $sql_where, $sql_group_by);
 	}
-	
+
 	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
-	
+
 	/**
 	 * get_users_group_query
-	 * Gets records from the user group table typically for a filtered set of users. 
+	 * Gets records from the user group table typically for a filtered set of users.
 	 *
 	 * @return object
 	 * @author Rob Hussey
@@ -1010,12 +1014,12 @@ class Flexi_auth extends Flexi_auth_lite
 		{
 			$sql_where = array($this->CI->auth->tbl_col_user_account['id'] => $this->CI->auth->session_data[$this->CI->auth->session_name['user_id']]);
 		}
-	
+
 		return $this->CI->flexi_auth_model->get_users($sql_select, $sql_where);
 	}
-	
+
 	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
-	
+
 	/**
 	 * get_unactivated_users_query
 	 * Get users that have not activated their account within a set time period.
@@ -1027,9 +1031,9 @@ class Flexi_auth extends Flexi_auth_lite
 	{
 		return $this->CI->flexi_auth_model->get_unactivated_users($inactive_days, $sql_select, $sql_where);
 	}
-	
+
 	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
-		
+
 	/**
 	 * get_groups_query
 	 * Returns a list of user groups matching the $sql_where condition.
@@ -1041,9 +1045,9 @@ class Flexi_auth extends Flexi_auth_lite
 	{
 		return $this->CI->flexi_auth_model->get_groups($sql_select, $sql_where);
 	}
-	
+
 	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
-		
+
 	/**
 	 * get_privileges_query
 	 * Returns a list of user privileges matching the $sql_where condition.
@@ -1055,7 +1059,7 @@ class Flexi_auth extends Flexi_auth_lite
 	{
 		return $this->CI->flexi_auth_model->get_privileges($sql_select, $sql_where);
 	}
-	
+
 	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
 
 	/**
@@ -1069,14 +1073,14 @@ class Flexi_auth extends Flexi_auth_lite
 	{
 		if (! $sql_where)
 		{
-			$sql_where = array($this->CI->auth->tbl_col_user_privilege_users['user_id'] => 
+			$sql_where = array($this->CI->auth->tbl_col_user_privilege_users['user_id'] =>
 				$this->CI->auth->session_data[$this->CI->auth->session_name['user_id']]);
 		}
-	
+
 		return $this->CI->flexi_auth_model->get_user_privileges($sql_select, $sql_where);
 	}
-        
-        
+
+
 	/**
 	 * get_user_group_privileges_query
 	 * Returns a user groups privileges using a users session group_id by default.
@@ -1088,17 +1092,17 @@ class Flexi_auth extends Flexi_auth_lite
 	{
 		if (! $sql_where)
 		{
-			$sql_where = array($this->CI->auth->tbl_col_user_privilege_groups['group_id'] => 
+			$sql_where = array($this->CI->auth->tbl_col_user_privilege_groups['group_id'] =>
 				key($this->CI->auth->session_data[$this->CI->auth->session_name['group']]));
 		}
-	
+
 		return $this->CI->flexi_auth_model->get_user_group_privileges($sql_select, $sql_where);
 	}
 
-	
-	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###	
+
+	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
 	// EMAIL FUNCTIONS
-	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###	
+	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
 
 	/**
 	 * send_email
@@ -1113,12 +1117,12 @@ class Flexi_auth extends Flexi_auth_lite
 		{
 			return FALSE;
 		}
-	
+
 		$template = $this->CI->auth->email_settings['email_template_directory'].$template;
 
 		return $this->CI->flexi_auth_model->send_email($email_to, $email_title, $email_data, $template);
 	}
-	
+
 	/**
 	 * template_data
 	 * flexi auth sends emails for a number of functions, this function can set additional data variables that can then be used by the template files.
@@ -1147,7 +1151,7 @@ class Flexi_auth extends Flexi_auth_lite
 		{
 			$data['template_data'] = $template_data;
 		}
-		
+
 		$this->CI->auth->template_data = $data;
 	}
 }
